@@ -1,6 +1,4 @@
-# quick checklist for API and Endpoint 
-
-# 🛠 Swagger / OpenAPI Pentest Checklist
+# 🛠 Swagger / OpenAPI / EndPoint Hunt Checklist
 
 ## 🔍 1. Recon
 - Extract all Endpoints (GET/POST/PUT/DELETE)
