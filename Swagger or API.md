@@ -26,7 +26,7 @@
 - Oversized payloads (DoS testing)
 - Extra fields not defined in schema
 - Null / empty values
-- Negative or abnormal values (-1, 999999999)
+- Negative or abnormal values (-1, 999999999,1.0000003)
 
 ## 🔐 5. Sensitive Data Exposure
 - Inspect swagger.json for API Keys, sample JWTs, developer emails
