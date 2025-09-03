@@ -10,85 +10,81 @@ This guide helps identify sensitive data, hidden logic, and potential vulnerabil
   ```bash
   tree -L 3 ./reconstructed > structure.txt
 
-Identify critical files (config.js, constants.ts, auth.js, api.js).
+- [ ] Identify critical files (config.js, constants.ts, auth.js, api.js).
 
-Extract external URLs and domains:
-
+- [ ] Extract external URLs and domains:
+  ```bash
     rg -o 'https?://[^\")\']+' ./reconstructed | sort -u > endpoints.txt
 
-🔑 Step 2: Secret Hunting
+# 🔑 Step 2: Secret Hunting
 
-Scan for secrets using tools:
+- [ ] Scan for secrets using tools:
 
-trufflehog filesystem ./reconstructed
-gitleaks detect --source=./reconstructed
+  ```bash
+  trufflehog filesystem ./reconstructed
+  gitleaks detect --source=./reconstructed
 
-Manual grep searches:
-
+- [ ] Manual grep searches:
+  ```bash
     grep -R -i "api_key" ./reconstructed
     grep -R -i "secret" ./reconstructed
     grep -R -i "token" ./reconstructed
     grep -R -i "password" ./reconstructed
 
-🌐 Step 3: API Endpoint Discovery
+# 🌐 Step 3: API Endpoint Discovery
 
-Search for fetch, axios, or graphql calls:
+- [ ] Search for fetch, axios, or graphql calls:
+  ```bash
+  rg -i "fetch\(|axios\." ./reconstructed > api_calls.txt
 
-rg -i "fetch\(|axios\." ./reconstructed > api_calls.txt
+- [ ] Test endpoints in BurpSuite/Postman:
 
-    Test endpoints in BurpSuite/Postman:
+  * Auth bypass
+  * IDOR (userId, orderId replacement)
+  * Rate-limit bypass
+  * GraphQL introspection
 
-        Auth bypass
+# 🛡 Step 4: Authentication & Session
 
-        IDOR (userId, orderId replacement)
+- [ ] Review login/signup flows.
 
-        Rate-limit bypass
+- [ ] Check for hardcoded JWT secrets or algorithms.
 
-        GraphQL introspection
+- [ ] Verify token storage (localStorage/sessionStorage).
 
-🛡 Step 4: Authentication & Session
+- [ ] Test for open redirects in login/logout/redirect flows.
 
-Review login/signup flows.
+# ⚡ Step 5: XSS & Input Handling
 
-Check for hardcoded JWT secrets or algorithms.
+- [ ] Search for dangerous functions:
 
-Verify token storage (localStorage/sessionStorage).
+      rg -i "innerHTML" ./reconstructed
+      rg -i "eval" ./reconstructed
+      rg -i "dangerouslySetInnerHTML" ./reconstructed
 
-    Test for open redirects in login/logout/redirect flows.
+- [ ] Analyze regex-based validation → attempt bypass.
 
-⚡ Step 5: XSS & Input Handling
+# 📦 Step 6: Dependency Vulnerabilities
 
-Search for dangerous functions:
+- [ ] Extract all packages and versions (from pnpm, package.json, etc.).
 
-rg -i "innerHTML" ./reconstructed
-rg -i "eval" ./reconstructed
-rg -i "dangerouslySetInnerHTML" ./reconstructed
+- [ ] Run vulnerability scans:
 
-    Analyze regex-based validation → attempt bypass.
+      npm audit --production --directory ./reconstructed
 
-📦 Step 6: Dependency Vulnerabilities
+- [ ] Cross-check with Snyk or Exploit-DB.
 
-Extract all packages and versions (from pnpm, package.json, etc.).
+# 🔥 Step 7: Business Logic Testing
 
-Run vulnerability scans:
+- [ ] Inspect cart, discount, payment related code.
 
-npm audit --production --directory ./reconstructed
+- [ ] Check conditions like:
 
-Cross-check with Snyk
+      if (discount > 50) { ... }
 
-    or Exploit-DB.
+- [ ] Test if validations are only client-side or enforced server-side.
 
-🔥 Step 7: Business Logic Testing
-
-Inspect cart, discount, payment related code.
-
-Check conditions like:
-
-if (discount > 50) { ... }
-
-    Test if validations are only client-side or enforced server-side.
-
-🧪 Step 8: Feature Discovery
+# 🧪 Step 8: Feature Discovery
 
 Search for feature flags (process.env.FEATURE_*).
 
@@ -96,52 +92,33 @@ Look for hidden routes or disabled code paths.
 
     Test endpoints for availability even if hidden in UI.
 
-📊 Step 9: Logging & Debugging
+# 📊 Step 9: Logging & Debugging
 
-Search for debug functions:
+- [ ] Search for debug functions:
 
-rg -i "console.log" ./reconstructed
-rg -i "debug" ./reconstructed
-rg -i "logger" ./reconstructed
+      rg -i "console.log" ./reconstructed
+      rg -i "debug" ./reconstructed
+      rg -i "logger" ./reconstructed
 
-    Identify if developer/debug flags are left enabled.
+- [ ] Identify if developer/debug flags are left enabled.
 
-⚔️ Step 10: Tools
+# ⚔️ Step 10: Tools
 
-    ripgrep (rg)
 
-→ fast searching
+* fast searching  →   `ripgrep (rg)`
 
-trufflehog
-/ gitleaks
+* secret hunting  →   trufflehog / gitleaks
 
-→ secret hunting
+* dependency vulns  →  npm audit / Snyk
 
-npm audit
-/ Snyk
+* API testing   →  BurpSuite / Postman
 
-→ dependency vulns
-
-BurpSuite
-/ Postman
-
-    → API testing
-
-✅ Deliverables
+# ✅ Deliverables
 
 At the end of the assessment, prepare a findings report including:
 
-    Secrets exposed (API keys, tokens, credentials)
-
-    Sensitive or undocumented API endpoints
-
-    Business logic flaws (e.g., cart/discount/payment manipulation)
-
-    Client-side XSS opportunities
-
-    Dependency vulnerabilities
-
-⚠️ Disclaimer
-
-This checklist is for authorized security testing only.
-Do not test or exploit systems without explicit permission
+* Secrets exposed (API keys, tokens, credentials)
+* Sensitive or undocumented API endpoints
+* Business logic flaws (e.g., cart/discount/payment manipulation)
+* Client-side XSS opportunities
+* Dependency vulnerabilities
