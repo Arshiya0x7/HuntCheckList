@@ -3,7 +3,7 @@
 A practical checklist for penetration testers after extracting source code from exposed JavaScript **source maps** (`.map` files).  
 This guide helps identify sensitive data, hidden logic, and potential vulnerabilities.
 
-.js.map to source with this script: https://github.com/denandz/sourcemapper
+.js.map file to source code with this script: https://github.com/denandz/sourcemapper
 
 
 ---
